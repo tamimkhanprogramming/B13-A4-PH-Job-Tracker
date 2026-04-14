@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Application Tracker</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+body {
+
+  background: #f3f4f6;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="max-w-6xl mx-auto px-6 py-6">
+
+  <h1 class="text-[22px] font-semibold text-[#1f2937] mb-5">
+
+    Job Application Tracker
+  </h1>
+
+  <div class="grid grid-cols-3 gap-6 mb-8">
+
+        <div class="bg-[#f9fafb] border border-gray-200 rounded-md p-4">
+
+        <p class="text-xs text-gray-500">Total</p>
+
+        <h2 id="totalCount" class="text-lg font-semibold text-green-600">0</h2>
+
+         </div>
+
+        <div class="bg-[#f9fafb] border border-gray-200 rounded-md p-4">
+
+          <p class="text-xs text-gray-500">Interview</p>
+
+          <h2 id="interviewCount" class="text-lg font-semibold text-black-600">0</h2>
+
+          </div>
+        <div class="bg-[#f9fafb] border border-gray-200 rounded-md p-4">
+
+        <p class="text-xs text-gray-500">Rejected</p>
+
+             <h2 id="rejectedCount" class="text-lg font-semibold text-black-600">0</h2> 
+             </div>
+
+            </div>
+
+  <div class="flex justify-between items-center mb-4">
+ <h2 class="text-[16px] font-semibold text-[#1f2937]">Available Jobs</h2>
+
+        <span id="jobCount" class="text-xs text-gray-500">0 jobs</span>
+  </div> 
+
+  <div class="flex gap-2 mb-4">
+
+  <button data-filter="all" class="tab bg-black-600 text-white text-xs px-4 py-1.5 rounded">All</button>
+    <button data-filter="INTERVIEW" class="tab bg-gray-100 text-gray-600 text-xs px-4 py-1.5 rounded">Interview</button>
+
+  <button data-filter="REJECTED" class="tab bg-gray-100 text-gray-600 text-xs px-4 py-1.5 rounded">Rejected</button>
+       </div>
+       
+<div id="emptyState" class="hidden bg-[#f9fafb] border border-gray-200 rounded-md p-10 text-center">
+
+  <div class="flex justify-center mb-4">
+    <div class="w-12 h-12 bg-blue-100 flex items-center justify-center rounded-lg">
+      <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 2h9l5 5v15a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/>
+      </svg>
+    </div>
+  </div>
+
+  <h3 class="text-sm font-semibold text-[#1f2937] mb-1">
+    No jobs available
+  </h3>
+
+  <p class="text-xs text-gray-500">
+    Check back soon for new job opportunities
+  </p>
+
+</div>
+<div id="jobContainer"></div>
+</div>
+<div id="emptyState" class="hidden bg-[#f9fafb] border border-gray-200 rounded-md p-10 text-center">
+
+  <div class="flex justify-center mb-4">
+    <div class="bg-blue-100 text-blue-500 p-4 rounded-lg text-3xl">
+      📄
+    </div>
+  </div>
+  <h3 class="text-sm font-semibold text-[#1f2937] mb-1">
+    No jobs available
+  </h3>
+  <p class="text-xs text-gray-500">
+    Check back soon for new job opportunities
+  </p>
+
+</div>
+<script>
+let jobs = [
+        {
+    company: "Mobile First Corp",
+    role: "React Native Developer",
+    location: "Remote • Full-time • $130,000 - $175,000",
+    desc: "Build cross-platform mobile applications using React Native.",
+    status: "NOT APPLIED"
+      },
+
+      {
+    company: "WebFlow Agency",
+    role: "Web Designer & Developer",
+    location: "Los Angeles, CA • Part-time • $80,000 - $120,000",
+    desc: "Create stunning web experiences for high-profile clients.",
+    status: "NOT APPLIED"
+  },
+
+   {
+    company: "DataViz Solutions",
+    role: "Data Visualization Specialist",
+    location: "Boston, MA • Full-time • $125,000 - $165,000",
+    desc: "Transform complex data into compelling visualizations.",
+    status: "NOT APPLIED"
+  },
+
+  {
+    company: "CloudFirst Inc",
+    role: "Backend Developer",
+    location: "Seattle, WA • Full-time • $140,000 - $190,000",
+    desc: "Design scalable backend systems using Python and AWS.",
+    status: "NOT APPLIED"
+   },
+
+  {
+    company: "Innovation Labs",
+    role: "UI/UX Engineer",
+    location: "Austin, TX • Full-time • $110,000 - $150,000",
+    desc: "Create beautiful and functional interfaces.",
+    status: "NOT APPLIED"
+      },
+    
+  {
+    company: "MegaCorp Solutions",
+    role: "JavaScript Developer",
+    location: "New York, NY • Full-time • $130,000 - $170,000",
+    desc: "Build enterprise applications using modern JS frameworks.",
+    status: "NOT APPLIED"
+           },
+  {
+    company: "StartupXYZ",
+    role: "Full Stack Engineer",
+    location: "Remote • Full-time • $120,000 - $160,000",
+    desc: "Work on fast-growing startup core platform.",
+    status: "NOT APPLIED"
+   },
+     {
+    company: "TechCorp Industries",
+    role: "Senior Frontend Developer",
+    location: "San Francisco, CA • Full-time • $130,000 - $175,000",
+    desc: "Build scalable React & TypeScript applications.",
+    status: "NOT APPLIED"
+  }
+  ];
+
+      let currentFilter = "all";
+
+   function renderJobs() {
+  
+  const container = document.getElementById("jobContainer");
+  
+  const emptyState = document.getElementById("emptyState");
+
+       container.innerHTML = "";
+
+  let filtered = jobs.filter(job =>
+       currentFilter === "all" || job.status === currentFilter
+  );
+  if (filtered.length === 0) {
+      emptyState.classList.remove("hidden");
+  } else {
+        emptyState.classList.add("hidden");
+  }
+
+    filtered.forEach((job, index) => {
+
+    let statusStyle = "bg-[#eef2ff] text-blue-600";
+       if (job.status === "INTERVIEW") statusStyle = "bg-green-100 text-green-600";
+    if (job.status === "REJECTED") statusStyle = "bg-red-100 text-red-600";
+
+        container.innerHTML += `
+          <div class="bg-[#f9fafb] border border-gray-200 rounded-md p-5 mb-4 relative">
+        <div onclick="deleteJob(${index})" class="absolute top-4 right-4 text-gray-300 cursor-pointer">🗑️</div>
+       <h3 class="text-sm font-semibold text-[#1f2937] mb-1">${job.company}</h3>
+           <p class="text-xs text-gray-500 mb-2">${job.role}</p>
+        <p class="text-xs text-gray-400 mb-3">${job.location}</p>
+       <span class="text-[10px] ${statusStyle} px-2 py-1 rounded">
+          ${job.status}
+            </span>
+       <p class="text-xs text-gray-500 mt-3 mb-4">
+          ${job.desc}
+        </p>
+       <div class="flex gap-2">
+              <button onclick="updateStatus(${index}, 'INTERVIEW')" class="border border-green-500           text-green-600 text-[10px] px-3 py-1 rounded">INTERVIEW</button>
+            <button onclick="updateStatus(${index}, 'REJECTED')" class="border border-red-500 text-red-600 text-[10px] px-3 py-1 rounded">REJECTED</button>
+             </div>
+      </div>
+    `;
+  });
+
+  updateStats();
+     }
+
+     function updateStatus(index, status) {
+  jobs[index].status = status;
+  renderJobs();
+        }
+
+         function deleteJob(index) {
+  jobs.splice(index, 1);
+  renderJobs();
+   }
+
+    function updateStats() {
+  document.getElementById("jobCount").textContent = jobs.length + "jobs";
+ document.getElementById("totalCount").textContent = jobs.length;
+     document.getElementById("interviewCount").textContent =
+    jobs.filter(j => j.status === "INTERVIEW").length;
+ document.getElementById("rejectedCount").textContent =
+    jobs.filter(j => j.status === "REJECTED").length;
+   }
+
+
+  document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(t => {
+         t.classList.remove("bg-blue-600","text-white");
+      t.classList.add("bg-gray-100","text-gray-600");
+    });
+
+    tab.classList.add("bg-blue-600","text-white");
+  currentFilter = tab.dataset.filter;
+    renderJobs();
+  });
+   });
+
+  renderJobs();
+
+</script>
+
+</body>
+</html>
