@@ -47,6 +47,8 @@ we put event on parent and check which child clicked.
 less code writting
 better performence
 work for dynamic elemnts also
+
+
 5. Difference between preventDefault() and stopPropagation()
 preventDefault() → stop default browser behaviour
 (like form submit reload page)
